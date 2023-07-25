@@ -11,6 +11,9 @@ public class Piece : MonoBehaviour
     public float lockDelay=0.5f;
     private float stepTime;
     private float lockTime;
+    public int left = 0;
+    public int right = 0;
+    public int steps=0;
 
     
 
@@ -21,6 +24,7 @@ public class Piece : MonoBehaviour
         this.rotationIndex=0;
         this.stepTime=Time.time+this.stepDelay;
         this.lockTime=0f;
+        this.steps=0;
 
         if(this.cells==null){
             this.cells=new Vector3Int[data.cells.Length];
@@ -61,9 +65,10 @@ public class Piece : MonoBehaviour
         }
 
         this.board.Set(this);
+        this.steps++;
     }
 
-    private void Step(){
+    public void Step(){
         this.stepTime=Time.time+this.stepDelay;
         Move(Vector2Int.down);
 
@@ -72,7 +77,7 @@ public class Piece : MonoBehaviour
         }
     }
 
-    private void HardDrop(){
+    public void HardDrop(){
         while(Move(Vector2Int.down)){
             continue;
         }
@@ -85,7 +90,7 @@ public class Piece : MonoBehaviour
         this.board.SpawnPiece();
     }
 
-    private bool Move(Vector2Int translation){
+    public bool Move(Vector2Int translation){
         Vector3Int newPosition=this.position;
         newPosition.x+=translation.x;
         newPosition.y+=translation.y;
@@ -98,7 +103,16 @@ public class Piece : MonoBehaviour
         return valid;
     }
 
-    private void Rotate(int direction){
+    public void MoveForAI(Vector2Int translation){
+        Vector3Int newPosition = this.position + (Vector3Int)translation;
+        if (this.board.IsValidPosition(this, newPosition))
+        {
+            this.position = newPosition;
+            this.lockTime = 0f;
+        }
+    }
+
+    public void Rotate(int direction){
         int originalRotation=this.rotationIndex;
         this.rotationIndex=Wrap(this.rotationIndex+direction, 0, 4);
 
@@ -162,5 +176,44 @@ public class Piece : MonoBehaviour
         else{
             return min+(input-min)%(max-min);
         }
+    }
+
+    public void MoveLeft()
+    {
+        this.board.Clear(this);
+        this.lockTime+=Time.deltaTime;
+        Move(Vector2Int.left);
+        left++;
+    }
+
+    public void MoveRight()
+    {
+        this.board.Clear(this);
+        this.lockTime+=Time.deltaTime;
+        Move(Vector2Int.right);
+        right++;
+    }
+
+    public void MoveDown()
+    {
+        this.board.Clear(this);
+        this.lockTime+=Time.deltaTime;
+        Move(Vector2Int.down);
+    }
+
+    public void RotateClockwise()
+    {
+        this.board.Clear(this);
+        this.lockTime+=Time.deltaTime;
+        Rotate(1);
+        right++;
+    }
+
+    public void RotateCounterClockwise()
+    {
+        this.board.Clear(this);
+        this.lockTime+=Time.deltaTime;
+        Rotate(-1);
+        left++;
     }
 }

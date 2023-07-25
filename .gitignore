@@ -73,3 +73,15 @@ crashlytics-build.properties
 
 #DS_Store
 .DS_Store/
+
+#Results
+results/
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
