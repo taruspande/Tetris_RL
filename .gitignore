@@ -76,6 +76,7 @@ crashlytics-build.properties
 
 #Results
 results/
+Demo/
 
 # Environments
 .env

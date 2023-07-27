@@ -7,6 +7,7 @@ public class Piece : MonoBehaviour
     public Vector3Int[] cells {get; private set;}
     public Vector3Int position {get; private set;}
     public int rotationIndex {get; private set;}
+    public bool isLocked { get; private set; }
     public float stepDelay=1f;
     public float lockDelay=0.5f;
     private float stepTime;
@@ -29,6 +30,7 @@ public class Piece : MonoBehaviour
         for(int i=0; i<data.cells.Length; i++){
             this.cells[i]=(Vector3Int)data.cells[i];
         }
+        this.isLocked = false;
     }
 
     private void Update(){
@@ -63,11 +65,14 @@ public class Piece : MonoBehaviour
         this.board.Set(this);
     }
 
-    public void Step(){
-        this.stepTime=Time.time+this.stepDelay;
+    public void Step()
+    {
+        this.stepTime = Time.time + this.stepDelay;
         Move(Vector2Int.down);
 
-        if(this.lockTime>=this.lockDelay){
+        if (!this.board.IsValidPosition(this, this.position + Vector3Int.down))
+        {
+            // If the next position is not valid, lock the piece in place
             Lock();
         }
     }
@@ -76,12 +81,14 @@ public class Piece : MonoBehaviour
         while(Move(Vector2Int.down)){
             continue;
         }
+        Lock();
     }
 
-    public void Lock(){
+    public void Lock()
+    {
         this.board.Set(this);
         this.board.ClearLines();
-        this.board.SpawnPiece();
+        this.isLocked = true;
     }
 
     public bool Move(Vector2Int translation){
@@ -186,11 +193,18 @@ public class Piece : MonoBehaviour
         Move(Vector2Int.right);
     }
 
-    public void MoveDown()
+    public bool MoveDown()
     {
         this.board.Clear(this);
-        this.lockTime+=Time.deltaTime;
-        Move(Vector2Int.down);
+        this.lockTime += Time.deltaTime;
+
+        if (!Move(Vector2Int.down))
+        {
+            // If the piece cannot move down anymore, lock it in place
+            Lock();
+            return false;
+        }
+        return true;
     }
 
     public void RotateClockwise()

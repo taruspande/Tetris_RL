@@ -185,13 +185,13 @@ public class Board : MonoBehaviour
 
         reward+=1.8f*this.linesCleared;
 
-        reward+=Mathf.Min(0.001f*timeElapsed, 0.1f);
+        reward+=Mathf.Min(0.001f*timeElapsed, 0.009f);
 
-        reward-=bumpiness/500;
+        reward-=bumpiness/100;
 
-        reward-=(float)maxHeight/500;
+        reward-=(float)maxHeight/100;
 
-        reward-=(float)holesCount/200;
+        reward-=(float)holesCount/80;
 
         if(IsGameOver()){
              reward-=1f;
