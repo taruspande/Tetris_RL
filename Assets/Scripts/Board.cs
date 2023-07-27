@@ -8,6 +8,8 @@ public class Board : MonoBehaviour
     public TetrominoData[] tetrominoes;
     public Vector3Int spawnPosition;
     public Vector2Int boardSize=new Vector2Int(10,20);
+    public int linesCleared;
+    private float startTime;
     public RectInt Bounds{
         get{
             Vector2Int position=new Vector2Int(-this.boardSize.x/2, -this.boardSize.y/2);
@@ -25,6 +27,7 @@ public class Board : MonoBehaviour
     }
 
     private void Start(){
+        startTime = Time.time;
         SpawnPiece();
     }
 
@@ -38,12 +41,19 @@ public class Board : MonoBehaviour
         }
         else{
             GameOver();
+            this.linesCleared=0;
         }
+    }
+
+    public float GetElapsedTime()
+    {
+        return Time.time - startTime;
     }
 
     private void GameOver(){
         this.tilemap.ClearAllTiles();
         Debug.Log("Game Over!!!");
+        startTime=Time.time;
     }
 
     public bool IsGameOver(){
@@ -86,17 +96,26 @@ public class Board : MonoBehaviour
         return true;
     }
 
-    public void ClearLines(){
-        RectInt bounds=this.Bounds;
-        int row=bounds.yMin;
-        while(row<bounds.yMax){
-            if(IsLineFull(row)){
+    public void ClearLines()
+    {
+        RectInt bounds = this.Bounds;
+        int row = bounds.yMin;
+        int linesCleared = this.linesCleared;
+
+        while (row < bounds.yMax)
+        {
+            if (IsLineFull(row))
+            {
                 LineClear(row);
+                linesCleared++;
             }
-            else{
+            else
+            {
                 row++;
             }
         }
+
+        this.linesCleared = linesCleared;
     }
 
     private bool IsLineFull(int row){
@@ -139,11 +158,6 @@ public class Board : MonoBehaviour
         return linesCleared;
     }
 
-    public bool IsLineCleared(){
-        int linesCleared=this.LinesCleared();
-        return linesCleared == this.boardSize.y;
-    }
-
     public int[,] GetBoardState(){
         int[,] boardState=new int[this.boardSize.x, this.boardSize.y];
         for (int row = 0; row < this.boardSize.y; row++){
@@ -162,24 +176,22 @@ public class Board : MonoBehaviour
 
     public float CalculateReward()
     {
-        int linesCleared = this.LinesCleared();
         int maxHeight = CalculateMaxHeight();
         int holesCount = CountHoles();
-        float reward = 0f;
-        int left = this.activePiece.left;
-        int right = this.activePiece.right;
-        int steps = this.activePiece.steps;
+        int bumpiness = CalculateBumpiness();
+        float timeElapsed = this.GetElapsedTime();
+        float reward = 0f;  
         
 
-        reward+=linesCleared;
+        reward+=1.8f*this.linesCleared;
 
-        // reward+=(float)0.002*steps;
+        reward+=Mathf.Min(0.001f*timeElapsed, 0.1f);
 
-        reward-=(float)maxHeight/100;
+        reward-=bumpiness/500;
 
-        reward-=(float)holesCount/10;
+        reward-=(float)maxHeight/500;
 
-        // reward-=Mathf.Abs((left-right)/1000);
+        reward-=(float)holesCount/200;
 
         if(IsGameOver()){
              reward-=1f;
@@ -256,6 +268,41 @@ public class Board : MonoBehaviour
         return holesCount;
     }
 
+    private int CalculateBumpiness()
+    {
+        RectInt bounds = this.Bounds;
+        int bumpiness = 0;
 
+        // Calculate the heights of each column
+        int[] columnHeights = new int[bounds.width];
+        for (int col = bounds.xMin; col < bounds.xMax; col++)
+        {
+            int height = 0;
+            for (int row = bounds.yMin; row < bounds.yMax; row++)
+            {
+                Vector3Int position = new Vector3Int(col, row, 0);
+                if (this.tilemap.HasTile(position))
+                {
+                    height = bounds.yMax - row; // Height of column 'col'
+                    break;
+                }
+            }
+            columnHeights[col - bounds.xMin] = height;
+        }
+
+        // Calculate the bumpiness by summing the absolute differences between neighboring columns
+        for (int col = 0; col < columnHeights.Length - 1; col++)
+        {
+            // Only consider bumpiness for columns with tiles below the top of the stack
+            if (columnHeights[col] < bounds.height)
+            {
+                bumpiness += Mathf.Abs(columnHeights[col] - columnHeights[col + 1]);
+            }
+        }
+
+        return bumpiness;
+    }
+
+    
 
 }

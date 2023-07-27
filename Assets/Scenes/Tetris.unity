@@ -199,6 +199,7 @@ GameObject:
   - component: {fileID: 115660207}
   - component: {fileID: 115660206}
   - component: {fileID: 115660208}
+  - component: {fileID: 115660209}
   m_Layer: 0
   m_Name: Board
   m_TagString: Untagged
@@ -235,6 +236,7 @@ MonoBehaviour:
     tile: {fileID: 11400000, guid: 014cf7a3ba26f48e9b517846881ef81d, type: 2}
   spawnPosition: {x: -1, y: 8, z: 0}
   boardSize: {x: 10, y: 20}
+  linesCleared: 0
 --- !u!156049354 &115660202
 Grid:
   m_ObjectHideFlags: 0
@@ -277,8 +279,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stepDelay: 1
   lockDelay: 0.5
-  left: 0
-  right: 0
 --- !u!114 &115660206
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -340,6 +340,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DecisionPeriod: 10
   TakeActionsBetweenDecisions: 0
+--- !u!114 &115660209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 115660200}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2902496c0120472b90269f94a0aec7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Record: 0
+  NumStepsToRecord: 0
+  DemonstrationName: TetrisDemo
+  DemonstrationDirectory: Demos
 --- !u!1 &153834124
 GameObject:
   m_ObjectHideFlags: 0

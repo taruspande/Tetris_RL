@@ -53,7 +53,7 @@ public class PlayTetris : Agent
         int rotation = discreteActions[1];
         int drop = Mathf.Clamp(Mathf.FloorToInt(continuousActions[0]), -1, 1);
         // Perform the chosen action on the Tetris board
-        if(actionsTakenThisStep<3){
+        if(actionsTakenThisStep<1){
             if (moveDirection == 0){
                 this.board.activePiece.MoveLeft();
                 actionsTakenThisStep++;
@@ -74,8 +74,11 @@ public class PlayTetris : Agent
         }
 
         if (drop == 1){
-            this.board.activePiece.HardDrop();
-            actionsTakenThisStep=0;
+            if (!this.board.IsGameOver())
+            {
+                this.board.activePiece.HardDrop();
+                actionsTakenThisStep = 0;
+            }
         }
 
         else if(drop == -1){
@@ -85,8 +88,9 @@ public class PlayTetris : Agent
 
         // Calculate the reward for the agent based on the game state
         float reward = this.board.CalculateReward();
+        int linesCleared=this.board.linesCleared;
         AddReward(reward);
-        Debug.Log("Reward: "+reward);
+        Debug.Log("Reward: "+reward+"  LinesCleared: "+linesCleared);
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)

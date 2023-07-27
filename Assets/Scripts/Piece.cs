@@ -11,9 +11,6 @@ public class Piece : MonoBehaviour
     public float lockDelay=0.5f;
     private float stepTime;
     private float lockTime;
-    public int left = 0;
-    public int right = 0;
-    public int steps=0;
 
     
 
@@ -24,7 +21,6 @@ public class Piece : MonoBehaviour
         this.rotationIndex=0;
         this.stepTime=Time.time+this.stepDelay;
         this.lockTime=0f;
-        this.steps=0;
 
         if(this.cells==null){
             this.cells=new Vector3Int[data.cells.Length];
@@ -65,7 +61,6 @@ public class Piece : MonoBehaviour
         }
 
         this.board.Set(this);
-        this.steps++;
     }
 
     public void Step(){
@@ -81,10 +76,9 @@ public class Piece : MonoBehaviour
         while(Move(Vector2Int.down)){
             continue;
         }
-        Lock();
     }
 
-    private void Lock(){
+    public void Lock(){
         this.board.Set(this);
         this.board.ClearLines();
         this.board.SpawnPiece();
@@ -183,7 +177,6 @@ public class Piece : MonoBehaviour
         this.board.Clear(this);
         this.lockTime+=Time.deltaTime;
         Move(Vector2Int.left);
-        left++;
     }
 
     public void MoveRight()
@@ -191,7 +184,6 @@ public class Piece : MonoBehaviour
         this.board.Clear(this);
         this.lockTime+=Time.deltaTime;
         Move(Vector2Int.right);
-        right++;
     }
 
     public void MoveDown()
@@ -206,7 +198,6 @@ public class Piece : MonoBehaviour
         this.board.Clear(this);
         this.lockTime+=Time.deltaTime;
         Rotate(1);
-        right++;
     }
 
     public void RotateCounterClockwise()
@@ -214,6 +205,5 @@ public class Piece : MonoBehaviour
         this.board.Clear(this);
         this.lockTime+=Time.deltaTime;
         Rotate(-1);
-        left++;
     }
 }
