@@ -85,3 +85,17 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+#Mono
+.dirstamp
+compile
+mono.h
+mono-*.tar.*
+mono_crash*
+tmpinst-dir.stamp
+extensions-config.h
+*.dylib.dSYM
+*.mlpd
+llvm/build/
+llvm/usr/
+mcs/build/compiler-server.log
